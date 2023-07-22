@@ -25,7 +25,7 @@ const Nav = ({ title, main }: { title: string; main: boolean }) => {
         ) : null}
       </div>
       <div className="flex-between w-full">
-        <hr className="border-1 border-black" />
+        <hr className="border-1 border-gray-200" />
       </div>
     </nav>
   );

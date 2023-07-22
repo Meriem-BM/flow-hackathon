@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 enum currencyEnum {
   USD = "$",
@@ -9,7 +10,7 @@ enum currencyEnum {
   FR = "Fr",
 }
 
-interface IFormInput {
+interface PFormInput {
   firstname: String;
   lastname: String;
   goal: Number;
@@ -19,9 +20,32 @@ interface IFormInput {
 }
 
 export default function App() {
-  const { register, handleSubmit } = useForm<IFormInput>();
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    console.log(data);
+  const { register, handleSubmit } = useForm<PFormInput>();
+  const router = useRouter();
+
+  const createPlayer = async (data: PFormInput) => {
+    try {
+      const response = await fetch("/api/players", {
+        method: "POST",
+        body: JSON.stringify({
+          firstname: data.firstname,
+          lastname: data.lastname,
+          goal: Number(data.goal),
+          salary: Number(data.salary),
+          devise: data.devise,
+          pictureURL: data.pictureURL || "",
+        }),
+      });
+
+      if (response.status === 200) router.push("/");
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onSubmit: SubmitHandler<PFormInput> = (data) => {
+    createPlayer(data)
   };
 
   return (
@@ -34,6 +58,7 @@ export default function App() {
           type="text"
           className="mt-1 p-2 w-full border border-gray-300 rounded-md"
           placeholder="Nom"
+          required
         />
       </div>
       <div className="mb-4">
@@ -44,6 +69,7 @@ export default function App() {
           type="text"
           className="mt-1 p-2 w-full border border-gray-300 rounded-md"
           placeholder="Prénom"
+          required
         />
       </div>
       <div className="flex justify-between mb-4">
@@ -52,9 +78,10 @@ export default function App() {
             {...register("salary")}
             id="salary"
             name="salary"
-            type="text"
+            type="number"
             className="p-2 border border-gray-300 rounded-md"
             placeholder="Salaire Annuel"
+            required
           />
         </div>
         <div className="">
@@ -63,6 +90,7 @@ export default function App() {
             id="devise"
             name="devise"
             className="w-40 p-2 border border-gray-300 rounded-md"
+            required
           >
             {[currencyEnum.USD, currencyEnum.EUR, currencyEnum.MAD, currencyEnum.FR].map(
               (currency) => (
@@ -82,6 +110,7 @@ export default function App() {
           type="number"
           className="mt-1 p-2 w-full border border-gray-300 rounded-md"
           placeholder="Nombre de buts"
+          required
         />
       </div>
       <button
